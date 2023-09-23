@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -52,50 +53,34 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private Date convertThaiBuddhistToGregorian(String thaiBuddhistDate) {
-        SimpleDateFormat thaiBuddhistFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat thaiBuddhistFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         thaiBuddhistFormat.setTimeZone(TimeZone.getTimeZone("Asia/Bangkok"));
 
         // Parse the Thai Buddhist date
         Date parsedDate = null;
         try {
             parsedDate = thaiBuddhistFormat.parse(thaiBuddhistDate);
+
+            // Create a Calendar object and set the parsed date
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(parsedDate);
+
+            // Subtract 543 years to convert to Gregorian
+            calendar.add(Calendar.YEAR, -543);
+
+            // Get the converted Gregorian date
+            return calendar.getTime();
         } catch (ParseException e) {
             e.printStackTrace();
+            return null;
         }
-
-        // Create a Calendar object and set the parsed date
-        Calendar calendar = Calendar.getInstance();
-        assert parsedDate != null;
-        calendar.setTime(parsedDate);
-
-        // Subtract 543 years to convert to Gregorian
-        calendar.add(Calendar.YEAR, -543);
-
-        // Get the converted Gregorian date
-        return calendar.getTime();
     }
 
-    private String getGregorianDate(String thaiBuddhistDate)  {
+    private String getGregorianDate(String thaiBuddhistDate) {
         Date gregorianDate = convertThaiBuddhistToGregorian(thaiBuddhistDate);
-        SimpleDateFormat gregorianFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat gregorianFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         return gregorianFormat.format(gregorianDate);
     }
-
-    private void fillFormFields() {
-
-        String javascript = "document.getElementsByName('firstname')[0].value = '" + stringArray[2] + "';" +
-                "document.getElementsByName('lastname')[0].value = '" + stringArray[4] + "';" +
-                "document.getElementsByName('personalId')[0].value = '" + stringArray[0] + "';" +
-                "document.getElementsByName('laserCode')[0].value = '';" +
-                "document.getElementsByName('birthDate')[0].value = '" + getGregorianDate(stringArray[14]) + "';" +
-                "document.getElementsByName('contactNumber')[0].value = '';" +
-                "document.getElementsByName('zipcode')[0].value = '';" +
-                "document.getElementsByName('address')[0].value = '" + stringArray[9] + " " + stringArray[10] + "';";
-
-
-        webView.evaluateJavascript(javascript, null);
-    }
-
     public class MyWebChromeClient extends WebChromeClient {
         public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
             // make sure there is no existing message
@@ -130,10 +115,8 @@ public class MainActivity2 extends AppCompatActivity {
             runnable = new Runnable() {
                 @Override
                 public void run() {
-                    if (!isNotFound) {
-                        checkForTextInWebView("กรอกข้อมูลส่วนบุคคล");
-                        handler.postDelayed(this, 5000);
-                    }
+                    checkForTextInWebView("กรอกข้อมูลส่วนบุคคล");
+                    handler.postDelayed(this, 5000);
                 }
             };
             handler.post(runnable);
@@ -148,19 +131,22 @@ public class MainActivity2 extends AppCompatActivity {
                     if (html != null && html.contains(value)) {
                         // The text is present on the page
                         try {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    fillFormFields();
-                                }
-                            });
-                        }
-                        catch (Exception ignored){
-
+                            fillFormFields();
+                        } catch (Exception ignored){
                         }
                     }
                 }
         );
+    }
+
+    private void fillFormFields() {
+        String javascript = "document.getElementsByName('firstname')[0].value = '" + stringArray[2] + "';" +
+                "document.getElementsByName('lastname')[0].value = '" + stringArray[4] + "';" +
+                "document.getElementsByName('personalId')[0].value = '" + stringArray[0] + "';" +
+                "document.getElementsByName('birthDate')[0].value = '" + getGregorianDate(stringArray[14]) + "';" +
+                "document.getElementsByName('address')[0].value = '" + stringArray[9] + " " + stringArray[10] + "';";
+
+        webView.evaluateJavascript(javascript, null);
     }
 
     @Override

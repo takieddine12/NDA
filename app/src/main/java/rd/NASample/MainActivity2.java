@@ -8,11 +8,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,7 +22,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class MainActivity2 extends AppCompatActivity {
@@ -46,9 +50,18 @@ public class MainActivity2 extends AppCompatActivity {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDatabaseEnabled(true);
         webView.setWebChromeClient(new MyWebChromeClient());
-        webView.loadUrl("https://beta-dealer.k4commu.co.th/services/sim-register");
 
-        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptThirdPartyCookies(webView, true);
+
+        Map<String,String> map = new HashMap<>();
+        map.put("firstname",stringArray[2]);
+        map.put("lastname",stringArray[4]);
+        map.put("personalId",stringArray[0]);
+        map.put("birthDate",getGregorianDate(stringArray[14]));
+        map.put("address",stringArray[9] + " " + stringArray[10]);
+
+        webView.loadUrl("https://beta-dealer.k4commu.co.th/services/sim-register",map);
 
     }
 
@@ -115,8 +128,12 @@ public class MainActivity2 extends AppCompatActivity {
             runnable = new Runnable() {
                 @Override
                 public void run() {
-                    checkForTextInWebView("กรอกข้อมูลส่วนบุคคล");
-                    handler.postDelayed(this, 5000);
+                    if(isNotFound){
+                        checkForTextInWebView("กรอกข้อมูลส่วนบุคคล");
+                        handler.postDelayed(this, 5000);
+                    } else {
+                        handler.removeCallbacks(this);
+                    }
                 }
             };
             handler.post(runnable);
@@ -140,6 +157,7 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private void fillFormFields() {
+
         String javascript = "document.getElementsByName('firstname')[0].value = '" + stringArray[2] + "';" +
                 "document.getElementsByName('lastname')[0].value = '" + stringArray[4] + "';" +
                 "document.getElementsByName('personalId')[0].value = '" + stringArray[0] + "';" +
@@ -147,6 +165,11 @@ public class MainActivity2 extends AppCompatActivity {
                 "document.getElementsByName('address')[0].value = '" + stringArray[9] + " " + stringArray[10] + "';";
 
         webView.evaluateJavascript(javascript, null);
+
+
+
+
+
     }
 
     @Override

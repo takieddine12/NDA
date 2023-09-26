@@ -55,7 +55,7 @@ public class MainActivity2 extends AppCompatActivity {
         map.put("firstname",stringArray[2]);
         map.put("lastname",stringArray[4]);
         map.put("personalId",stringArray[0]);
-        map.put("birthDate",getGregorianDate(stringArray[14]));
+        map.put("birthDate",getGregorianDate(stringArray[18]));
         map.put("address",stringArray[9] + " " + stringArray[10]);
 
         webView.loadUrl("https://beta-dealer.k4commu.co.th/services/card-reader/sim-register",map);
@@ -79,10 +79,12 @@ public class MainActivity2 extends AppCompatActivity {
             // Subtract 543 years to convert to Gregorian
             calendar.add(Calendar.YEAR, -543);
 
+
             // Get the converted Gregorian date
             return calendar.getTime();
         } catch (ParseException e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -146,7 +148,6 @@ public class MainActivity2 extends AppCompatActivity {
                             handler.removeCallbacks(runnable);
                             handler.removeCallbacksAndMessages(null);
                         } catch (Exception ignored){
-                            Log.d("TAG","BLOC 2");
                         }
                     }
                 }
@@ -164,7 +165,7 @@ public class MainActivity2 extends AppCompatActivity {
         String personalIdScript = "document.getElementsByName('personalId')[0].value = '" + stringArray[0] + "';";
         webView.evaluateJavascript("javascript:" + personalIdScript, null);
 
-        String birthDateScript = "document.getElementsByName('birthDate')[0].value = '" + getGregorianDate(stringArray[14]) + "';";
+        String birthDateScript = "document.getElementsByName('birthDate')[0].value = '" + getGregorianDate(stringArray[18]) + "';";
         webView.evaluateJavascript("javascript:" + birthDateScript, null);
 
         String addressScript = "document.getElementsByName('address')[0].value = '" + stringArray[9] + " " + stringArray[10] + "';";

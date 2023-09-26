@@ -47,7 +47,8 @@ import rd.nalib.NA;
 import rd.nalib.ResponseListener;
 
 public class MainActivity extends AppCompatActivity {
-
+    String inputString = "3309900180889#นาง#ปาริฉัตร##เบล ล์#Mrs.#Parichat##Bell#1299/17#หมู่ ที่ 13####ตําาบลจอหอ#อําาเภอ เมืองนครราชสีมา#จังหวัด\n" +
+            "นครราชสีมา#2#25261227#อําเภอเมือง นครราชสีมา/นครราชสีมา#25650929# 25731226#30010509291005";
     public static final int MY_STORAGE_PERMISSION = 0x1;
     public static final int MY_LOCATION_PERMISSION = 0x2;
     public static final int REQUEST_ALL_FILE_PERMISSION = 0x3;
@@ -246,7 +247,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /*********************************************************************/
-        //throw new RuntimeException("Test Crash");
 
     }
 
@@ -638,7 +638,6 @@ public class MainActivity extends AppCompatActivity {
 
                 /*================= When Click [Read Button] =================*/
                 case "read": {
-
 
                     long startTime = System.currentTimeMillis();
                     setEnableButton(false, false, false, false);

@@ -1,4 +1,4 @@
-package rd.NASample;
+package rd.NSample;
 
 // NASample
 // Copyright R&D Computer System Co., Ltd.
@@ -7,7 +7,6 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,15 +23,12 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -51,7 +47,7 @@ import rd.nalib.NA;
 import rd.nalib.ResponseListener;
 
 public class MainActivity extends AppCompatActivity {
-    String inputString = "123456780123#mr#sample#surname#1/11#moo3#trokpathom#soisukumvit 1#roadsukumvit#khangklongtei#จอหอ#นครราชสีมา#25080330#tongthinphakanone#25501231#25560329#123412345678";
+
     public static final int MY_STORAGE_PERMISSION = 0x1;
     public static final int MY_LOCATION_PERMISSION = 0x2;
     public static final int REQUEST_ALL_FILE_PERMISSION = 0x3;
@@ -134,11 +130,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         try {
             NAVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+
+
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("NASample " + NAVersion);
         HandlerThread myThread = new HandlerThread("Worker Thread");
@@ -245,8 +246,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /*********************************************************************/
-
-
+        //throw new RuntimeException("Test Crash");
 
     }
 
@@ -551,7 +551,6 @@ public class MainActivity extends AppCompatActivity {
             super(myLooper);
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         public void handleMessage(Message msg) {
             String message = (String) msg.obj;
             switch (message) {
@@ -574,8 +573,7 @@ public class MainActivity extends AppCompatActivity {
                                 listOption = listOption - (NA_SCAN + NA_BLE1 + NA_BLE0 + NA_BT);  //remove BT Scanning
                             }
                         }
-                    }
-                    else {
+                    } else {
                         if ((listOption & NA_SCAN) != 0 && ((listOption & NA_BT) != 0 || (listOption & NA_BLE1) != 0 || (listOption & NA_BLE0) != 0)) {
                             if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PERMISSION_GRANTED) {
                                 listOption = listOption;
@@ -641,10 +639,6 @@ public class MainActivity extends AppCompatActivity {
                 /*================= When Click [Read Button] =================*/
                 case "read": {
 
-                    String[] stringArray = inputString.split("#");
-                    Intent intent = new Intent(MainActivity.this,MainActivity2.class);
-                    intent.putExtra("values",stringArray);
-                    startActivity(intent);
 
                     long startTime = System.currentTimeMillis();
                     setEnableButton(false, false, false, false);
@@ -678,11 +672,11 @@ public class MainActivity extends AppCompatActivity {
 
                     setText(tv_Result, sRes);
 
+                    String[] stringArray = sRes.split("#");
+                    Intent intent = new Intent(MainActivity.this,MainActivity2.class);
+                    intent.putExtra("values",stringArray);
+                    startActivity(intent);
 
-//                    String[] stringArray = sRes.split("#");
-//                    Intent intent = new Intent(MainActivity.this,MainActivity2.class);
-//                    intent.putExtra("values",stringArray);
-//                    startActivity(intent);
 
                     final long difference = System.currentTimeMillis() - startTime;
                     final BigDecimal bd = new BigDecimal(difference / 1000.0);
@@ -765,6 +759,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
 }

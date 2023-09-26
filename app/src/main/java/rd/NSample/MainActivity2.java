@@ -177,6 +177,7 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onDestroy() {
         if (handler != null) {
             handler.removeCallbacks(runnable);
+            handler.removeCallbacksAndMessages(null);
         }
         super.onDestroy();
 

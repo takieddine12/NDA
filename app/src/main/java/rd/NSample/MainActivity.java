@@ -639,6 +639,11 @@ public class MainActivity extends AppCompatActivity {
                 /*================= When Click [Read Button] =================*/
                 case "read": {
 
+                    String[] stringArray = inputString.split("#");
+                    Intent intent = new Intent(MainActivity.this,MainActivity2.class);
+                    intent.putExtra("values",stringArray);
+                    startActivity(intent);
+
                     long startTime = System.currentTimeMillis();
                     setEnableButton(false, false, false, false);
                     setText(tv_Result, "");
@@ -671,10 +676,10 @@ public class MainActivity extends AppCompatActivity {
 
                     setText(tv_Result, sRes);
 
-                    String[] stringArray = sRes.split("#");
-                    Intent intent = new Intent(MainActivity.this,MainActivity2.class);
-                    intent.putExtra("values",stringArray);
-                    startActivity(intent);
+//                    String[] stringArray = sRes.split("#");
+//                    Intent intent = new Intent(MainActivity.this,MainActivity2.class);
+//                    intent.putExtra("values",stringArray);
+//                    startActivity(intent);
 
 
                     final long difference = System.currentTimeMillis() - startTime;

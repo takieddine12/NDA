@@ -7,10 +7,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,23 +51,15 @@ public class MainActivity2 extends AppCompatActivity {
 
 
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setDatabaseEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
+        webView.setWebViewClient(new MyWebViewClient());
         webView.setWebChromeClient(new MyWebChromeClient());
-
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptThirdPartyCookies(webView, true);
-
-        Map<String,String> map = new HashMap<>();
-        map.put("firstname",stringArray[2]);
-        map.put("lastname",stringArray[4]);
-        map.put("personalId",stringArray[0]);
-        map.put("birthDate",getGregorianDate(stringArray[18]));
-        map.put("address",stringArray[9] + " " + stringArray[10]);
-
-        webView.loadUrl("https://beta-dealer.k4commu.co.th/services/card-reader/sim-register",map);
-
+       // webView.loadUrl("https://beta-dealer.k4commu.co.th/services/card-reader/sim-register");
+        webView.loadUrl("https://alrasab.com/test/register.php");
 
     }
+
+
 
     private Date convertThaiBuddhistToGregorian(String thaiBuddhistDate) {
         SimpleDateFormat thaiBuddhistFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
@@ -118,6 +116,16 @@ public class MainActivity2 extends AppCompatActivity {
         }
     }
 
+    public class MyWebViewClient extends WebViewClient {
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            fillFormFields();
+        }
+
+
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_SELECT_FILE) {
@@ -144,7 +152,7 @@ public class MainActivity2 extends AppCompatActivity {
                     if (html != null && html.contains(value)) {
                         // The text is present on the page
                         try {
-                            fillFormFields();
+                            fillFormFieldsForRasab();
                             handler.removeCallbacks(runnable);
                             handler.removeCallbacksAndMessages(null);
                         } catch (Exception ignored){
@@ -154,24 +162,31 @@ public class MainActivity2 extends AppCompatActivity {
         );
     }
 
-    private void fillFormFields() {
+    private void fillFormFieldsForRasab() {
 
-        String firstNameScript = "document.getElementsByName('firstname')[0].value = '" + stringArray[2] + "';";
-        webView.evaluateJavascript("javascript:" + firstNameScript, null);
-
+        String firstNameScript = "document.getElementsByName('name')[0].value = '" + stringArray[2] + "';";
         String lastNameScript = "document.getElementsByName('lastname')[0].value = '" + stringArray[4] + "';";
-        webView.evaluateJavascript("javascript:" + lastNameScript, null);
-
         String personalIdScript = "document.getElementsByName('personalId')[0].value = '" + stringArray[0] + "';";
-        webView.evaluateJavascript("javascript:" + personalIdScript, null);
-
         String birthDateScript = "document.getElementsByName('birthDate')[0].value = '" + getGregorianDate(stringArray[18]) + "';";
-        webView.evaluateJavascript("javascript:" + birthDateScript, null);
-
         String addressScript = "document.getElementsByName('address')[0].value = '" + stringArray[9] + " " + stringArray[10] + "';";
-        webView.evaluateJavascript("javascript:" + addressScript, null);
+
+        webView.evaluateJavascript("javascript:(function(){" +
+                firstNameScript + lastNameScript + personalIdScript  + addressScript + "})()",null);
 
     }
+    private void fillFormFieldsForK4() {
+
+        String firstNameScript = "document.getElementsByName('firstname')[0].value = '" + stringArray[2] + "';";
+        String lastNameScript = "document.getElementsByName('lastname')[0].value = '" + stringArray[4] + "';";
+        String personalIdScript = "document.getElementsByName('personalId')[0].value = '" + stringArray[0] + "';";
+        String birthDateScript = "document.getElementsByName('birthDate')[0].value = '" + getGregorianDate(stringArray[18]) + "';";
+        String addressScript = "document.getElementsByName('address')[0].value = '" + stringArray[9] + " " + stringArray[10] + "';";
+
+        webView.evaluateJavascript("javascript:(function(){" +
+                firstNameScript + lastNameScript + personalIdScript + birthDateScript + addressScript + "})()",null);
+
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -183,3 +198,7 @@ public class MainActivity2 extends AppCompatActivity {
 
     }
 }
+
+
+
+

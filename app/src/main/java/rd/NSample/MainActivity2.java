@@ -6,15 +6,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.webkit.ConsoleMessage;
-import android.webkit.CookieManager;
-import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -25,9 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 public class MainActivity2 extends AppCompatActivity {
@@ -54,8 +45,7 @@ public class MainActivity2 extends AppCompatActivity {
         webView.getSettings().setDomStorageEnabled(true);
         webView.setWebViewClient(new MyWebViewClient());
         webView.setWebChromeClient(new MyWebChromeClient());
-       // webView.loadUrl("https://beta-dealer.k4commu.co.th/services/card-reader/sim-register");
-        webView.loadUrl("https://alrasab.com/test/register.php");
+        webView.loadUrl("https://beta-dealer.k4commu.co.th/services/card-reader/sim-register");
 
     }
 
@@ -116,11 +106,11 @@ public class MainActivity2 extends AppCompatActivity {
         }
     }
 
-    public class MyWebViewClient extends WebViewClient {
+    public static class MyWebViewClient extends WebViewClient {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-            fillFormFields();
+
         }
 
 
@@ -132,27 +122,24 @@ public class MainActivity2 extends AppCompatActivity {
             if (uploadMessage == null) return;
             uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
             uploadMessage = null;
-
-
-            runnable = new Runnable() {
-                @Override
-                public void run() {
-                    checkForTextInWebView("กรอกข้อมูลส่วนบุคคล");
-                    handler.postDelayed(this, 5000);
-                }
-            };
-            handler.post(runnable);
         }
+
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                checkForTextInWebView("กรอกข้อมูลส่วนบุคคล");
+                handler.postDelayed(this, 5000);
+            }
+        };
+        handler.post(runnable);
     }
 
     private void checkForTextInWebView(String value)  {
         webView.evaluateJavascript("(function() { return document.body.innerText; })();",
                 html -> {
-                    // Check if the HTML content contains the search text
                     if (html != null && html.contains(value)) {
-                        // The text is present on the page
                         try {
-                            fillFormFieldsForRasab();
+                            fillFormFields();
                             handler.removeCallbacks(runnable);
                             handler.removeCallbacksAndMessages(null);
                         } catch (Exception ignored){
@@ -162,19 +149,8 @@ public class MainActivity2 extends AppCompatActivity {
         );
     }
 
-    private void fillFormFieldsForRasab() {
 
-        String firstNameScript = "document.getElementsByName('name')[0].value = '" + stringArray[2] + "';";
-        String lastNameScript = "document.getElementsByName('lastname')[0].value = '" + stringArray[4] + "';";
-        String personalIdScript = "document.getElementsByName('personalId')[0].value = '" + stringArray[0] + "';";
-        String birthDateScript = "document.getElementsByName('birthDate')[0].value = '" + getGregorianDate(stringArray[18]) + "';";
-        String addressScript = "document.getElementsByName('address')[0].value = '" + stringArray[9] + " " + stringArray[10] + "';";
-
-        webView.evaluateJavascript("javascript:(function(){" +
-                firstNameScript + lastNameScript + personalIdScript  + addressScript + "})()",null);
-
-    }
-    private void fillFormFieldsForK4() {
+    private void fillFormFields() {
 
         String firstNameScript = "document.getElementsByName('firstname')[0].value = '" + stringArray[2] + "';";
         String lastNameScript = "document.getElementsByName('lastname')[0].value = '" + stringArray[4] + "';";
